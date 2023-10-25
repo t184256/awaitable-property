@@ -12,23 +12,9 @@
         mypy pytest-mypy
       ] ++ [pkgs.ruff]);
 
-      awaitable-property-package = {pkgs, python3Packages}:
-        python3Packages.buildPythonPackage {
-          pname = "awaitable-property";
-          version = "0.0.1";
-          src = ./.;
-          format = "pyproject";
-          propagatedBuildInputs = deps python3Packages;
-          nativeBuildInputs = [ python3Packages.setuptools ];
-          checkInputs = tools pkgs python3Packages;
-        };
-
-      overlay = final: prev: {
+      fresh-mypy-overlay = final: prev: {
         pythonPackagesExtensions =
           prev.pythonPackagesExtensions ++ [(pyFinal: pyPrev: {
-            awaitable-property = final.callPackage awaitable-property-package {
-              python3Packages = pyFinal;
-            };
             mypy =
               if prev.lib.versionAtLeast pyPrev.mypy.version "1.6.1"
               then pyPrev.mypy
@@ -44,10 +30,35 @@
               });
           })];
       };
+
+      awaitable-property-package = {pkgs, python3Packages}:
+        python3Packages.buildPythonPackage {
+          pname = "awaitable-property";
+          version = "0.0.1";
+          src = ./.;
+          format = "pyproject";
+          propagatedBuildInputs = deps python3Packages;
+          nativeBuildInputs = [ python3Packages.setuptools ];
+          checkInputs = tools pkgs python3Packages;
+        };
+
+      awaitable-property-overlay = final: prev: {
+        pythonPackagesExtensions =
+          prev.pythonPackagesExtensions ++ [(pyFinal: pyPrev: {
+            awaitable-property = final.callPackage awaitable-property-package {
+              python3Packages = pyFinal;
+            };
+          })];
+      };
+
+      overlay-all = nixpkgs.lib.composeManyExtensions [
+        awaitable-property-overlay
+        fresh-mypy-overlay
+      ];
     in
       flake-utils.lib.eachDefaultSystem (system:
         let
-          pkgs = import nixpkgs { inherit system; overlays = [ overlay ]; };
+          pkgs = import nixpkgs { inherit system; overlays = [ overlay-all ]; };
           defaultPython3Packages = pkgs.python311Packages;  # force 3.11
 
           awaitable-property = pkgs.callPackage awaitable-property-package {
@@ -65,5 +76,5 @@
           packages.awaitable-property = awaitable-property;
           packages.default = awaitable-property;
         }
-    ) // { overlays.default = overlay; };
+    ) // { overlays.default = awaitable-property-overlay; };
 }
