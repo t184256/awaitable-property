@@ -6,6 +6,9 @@
 @awaitable_property decorator, lets you await obj.attrname
 """
 
-from awaitable_property._awaitable_property import awaitable_property
+from awaitable_property._awaitable_property import (
+    AwaitableProperty,
+    awaitable_property,
+)
 
-__all__ = ['awaitable_property']
+__all__ = ['awaitable_property', 'AwaitableProperty']
