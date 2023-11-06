@@ -28,10 +28,10 @@ async def no_transform(
 
 
 class AwaitableProperty(typing.Generic[_T_obj, _T_get, _T_ret]):
-    __slots__ = ('__doc__', 'attrname', 'bound_cls', 'wrapped', 'wrapper')
+    __slots__ = ('__doc__', 'attrname', 'bound_cls', '__wrapped__', 'wrapper')
     attrname: str | None  # binds later
     bound_cls: type[_T_obj] | None  # binds later
-    wrapped: _Corofunc[_T_obj, _T_get]
+    __wrapped__: _Corofunc[_T_obj, _T_get]
     wrapper: _Corofunc[_T_obj, _T_ret]
 
     def __init__(
@@ -40,14 +40,14 @@ class AwaitableProperty(typing.Generic[_T_obj, _T_get, _T_ret]):
         transformer: _Transformer[_T_obj, _T_get, _T_ret],
     ) -> None:
         self.attrname = None
-        self.wrapped = corofunc
+        self.__wrapped__ = corofunc
         assert inspect.iscoroutinefunction(corofunc)  # noqa: S101
         self.__doc__ = f'[awaitable property] {corofunc.__doc__}'
 
-        @functools.wraps(self.wrapped)
+        @functools.wraps(self.__wrapped__)
         async def wrapper(obj: _T_obj) -> _T_ret:
             assert self.attrname is not None  # noqa: S101
-            return await transformer(obj, self.wrapped, self.attrname)
+            return await transformer(obj, self.__wrapped__, self.attrname)
 
         wrapper.__name__ = corofunc.__name__ + '.wrapper'
         wrapper.__qualname__ = corofunc.__qualname__ + '.wrapper'
