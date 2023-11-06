@@ -3,7 +3,6 @@
 
 """Main module of awaitable_property."""
 
-
 import functools
 import inspect
 import typing
@@ -70,16 +69,14 @@ class AwaitableProperty(typing.Generic[_T_obj, _T_get, _T_ret]):
         self: typing.Self,
         obj: _T_obj,
         objtype: type[_T_obj],
-    ) -> typing.Awaitable[_T_ret]:
-        ...  # overload
+    ) -> typing.Awaitable[_T_ret]: ...  # overload
 
     @typing.overload  # .__get__(None, cls) invocation from a class
     def __get__(
         self: typing.Self,
         obj: None,
         objtype: type,  # we don't care which type, we don't use it
-    ) -> typing.Self:
-        ...  # overload
+    ) -> typing.Self: ...  # overload
 
     def __get__(
         self: typing.Self,
@@ -108,15 +105,13 @@ def awaitable_property(
 ) -> typing.Callable[
     [_Corofunc[_T_obj, _T_get]],
     AwaitableProperty[_T_obj, _T_get, _T_ret],
-]:
-    ...  # overload
+]: ...  # overload
 
 
 @typing.overload  # for decorating with awaitable_property, _T_get = _T_ret
 def awaitable_property(
     corofunc: _Corofunc[_T_obj, _T_get],
-) -> AwaitableProperty[_T_obj, _T_get, _T_get]:
-    ...  # overload
+) -> AwaitableProperty[_T_obj, _T_get, _T_get]: ...  # overload
 
 
 # I want to be able to later extend it with parameters, so, two forms
