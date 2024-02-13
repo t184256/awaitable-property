@@ -11,4 +11,4 @@ from awaitable_property._awaitable_property import (
     awaitable_property,
 )
 
-__all__ = ['awaitable_property', 'AwaitableProperty']
+__all__ = ['AwaitableProperty', 'awaitable_property']

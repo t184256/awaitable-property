@@ -28,7 +28,7 @@ async def no_transform(
 
 
 class AwaitableProperty(typing.Generic[_T_obj, _T_get, _T_ret]):
-    __slots__ = ('__doc__', 'attrname', 'bound_cls', '__wrapped__', 'wrapper')
+    __slots__ = ('__doc__', '__wrapped__', 'attrname', 'bound_cls', 'wrapper')
     attrname: str | None  # binds later
     bound_cls: type[_T_obj] | None  # binds later
     __wrapped__: _Corofunc[_T_obj, _T_get]
@@ -170,4 +170,4 @@ def _mk_awaitable_property(
     return wrapper
 
 
-__all__ = ['awaitable_property', 'AwaitableProperty']
+__all__ = ['AwaitableProperty', 'awaitable_property']
